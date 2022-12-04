@@ -5,6 +5,8 @@ https://docs.nestjs.com/providers#services
 import { Injectable } from '@nestjs/common';
 import { Event } from '../Event';
 import { EventQueryParam } from '../EventQueryParam';
+import { CreateEventDto } from './../dto/CreateEventDto';
+import { UpdateEventDto } from './../dto/UpdateEventDto';
 
 @Injectable()
 export class EventService {
@@ -20,39 +22,43 @@ export class EventService {
     );
   }
 
-  create(params: Event) {
-    params.id = Math.max(...this.events.map((event) => event.id)) + 1;
-    this.events.push(params);
-    return params;
+  find(id: number): Event {
+    return this.events.find((event) => event.id === Number(id)) || null
   }
 
-  update(id: number, params: Event): Event {
-    const index = this.events.findIndex((event) => event.id === id);
+  create(params: CreateEventDto) {
+    const id = this.events.length < 1 ? 1 : Math.max(...this.events.map((event) => event.id)) + 1;
+    const event: Event = {
+      ...params,
+      when: params.when ? new Date(params.when): new Date,
+      id,
+    }
+    this.events.push(event);
+    return event;
+  }
+
+  update(id: number, params: UpdateEventDto): Event {
+    const index = this.events.findIndex((event) => event.id === Number(id));
     if (index >= 0) {
-      this.events[index].name = params.name;
-      this.events[index].description = params.description;
-      this.events[index].when = params.when;
-      this.events[index].address = params.address;
-      this.events[index].id =
-        Math.max(...this.events.map((event) => event.id)) + 1;
+      this.events[index] = {
+        ...this.events[index],
+        ...params,
+        when: params.when ? new Date(params.when) : this.events[index].when,
+        id: this.events[index].id,
+      };
+      return this.events[index];
     }
     return null;
   }
 
-  updatePartial(id: number, params: Event): Event {
-    const index = this.events.findIndex((event) => event.id === id);
+  updatePartial(id: number, params: UpdateEventDto): Event {
+    const index = this.events.findIndex((event) => event.id === Number(id));
     if (index >= 0) {
-      if (params.name) {
-        this.events[index].name = params.name;
-      }
-      if (params.description) {
-        this.events[index].description = params.description;
-      }
-      if (params.when) {
-        this.events[index].when = params.when;
-      }
-      if (params.address) {
-        this.events[index].address = params.address;
+      this.events[index] = {
+        ...this.events[index],
+        ...params,
+        when: params.when ? new Date(params.when) : this.events[index].when,
+        id: this.events[index].id,
       }
       return this.events[index];
     }
@@ -60,11 +66,21 @@ export class EventService {
   }
 
   destroy(id: number): boolean {
-    const index = this.events.findIndex((event) => event.id === id);
+    const index = this.events.findIndex((event) => event.id === Number(id));
     if (index >= 0) {
       this.events.splice(index, 1);
       return true;
     }
     return false;
+  }
+
+  destroyMany(ids: Array<number>): number {
+    let deletedCount = 0;
+    ids.forEach((id) => {
+      if (this.destroy(id)) {
+        deletedCount++;
+      }
+    });
+    return deletedCount;
   }
 }

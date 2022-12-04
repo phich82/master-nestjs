@@ -47,13 +47,7 @@ export class EventController {
 
   @Get(':id')
   find(@Param('id') id: number): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success(
-      [
-        new EventDto('Name 1', 'Description 1', 'AM', 'Address 1', 1),
-        new EventDto('Name 2', 'Description 2', 'PM', 'Address 2', 2),
-        new EventDto('Name 3', 'Description 3', 'PM', 'Address 3', 3),
-      ].find((r) => r.id == id) || null,
-    );
+    return this.apiResponse.success(this.eventService.find(id));
   }
 
   @Post()
@@ -66,9 +60,9 @@ export class EventController {
   @Put(':id')
   update(
     @Param('id') id: number,
-    @Body() params: Event,
+    @Body() params: UpdateEventDto,
   ): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success();
+    return this.apiResponse.success(this.eventService.update(id, params));
   }
 
   @Patch(':id')
@@ -76,11 +70,11 @@ export class EventController {
     @Param('id') id: number,
     @Body() params: UpdateEventDto,
   ): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success(new EventDto());
+    return this.apiResponse.success(this.eventService.updatePartial(id, params));
   }
 
   @Delete(':id')
   destroy(@Param('id') id: number): JsonResponse<any, ErrorJsonResponse> {
-    return this.apiResponse.success();
+    return this.apiResponse.success(this.eventService.destroy(id));
   }
 }
