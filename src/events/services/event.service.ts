@@ -3,17 +3,23 @@ https://docs.nestjs.com/providers#services
 */
 
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Event } from '../Event';
 import { EventQueryParam } from '../EventQueryParam';
 import { CreateEventDto } from './../dto/CreateEventDto';
 import { UpdateEventDto } from './../dto/UpdateEventDto';
+import { EventRepository } from './../repositories/event.repository';
 
 @Injectable()
 export class EventService {
   private events: Event[] = [];
 
-  searchAll(): Event[] {
-    return this.events;
+  constructor(
+    @InjectRepository(EventRepository) private readonly eventRepository: EventRepository
+  ) {}
+
+  async searchAll(): Promise<Event[]> {
+    return await this.eventRepository.find();
   }
 
   searchBy(paramsQuery: EventQueryParam): Event[] {
