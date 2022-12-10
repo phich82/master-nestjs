@@ -15,7 +15,7 @@ image:
 
 tasks:
   - init: |
-      npm i;
+      npm i
     command: |
       mysql -e "CREATE DATABASE IF NOT EXISTS master_nestjs"
       mysql -e "CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin123';"
@@ -23,28 +23,21 @@ tasks:
       mysql -e "FLUSH PRIVILEGES;"
 
       docker run --restart always -d --name=mysql -p 127.0.0.1:3306:3306 -e MYSQL_DATABASE=master_nestjs MYSQL_USER=admin MYSQL_ROOT_PASSWORD=admin123 mysql:8
-
-      docker ps
-      gp ports await 3306
-
-      # docker run --restart always -d --name=mysql -p 127.0.0.1:3306:3306 -e MYSQL_DATABASE=master_nestjs MYSQL_USER=admin MYSQL_ROOT_PASSWORD=admin123 mysql:8
-      # docker run --restart always -d --name=adminer --link mysql:mysql -p 5000:8080 -e ADMINER_DESIGN=phich82 -e ADMINER_DEFAULT_SERVER=mysql
-
-      mysqladmin reload;
+      docker run --restart always -d --name=adminer --link mysql:mysql -p 5000:8080 -e ADMINER_DESIGN=phich82 -e ADMINER_DEFAULT_SERVER=mysql
 
       # Gitpod registers the ports on first docker command
-      # docker ps
+      docker ps
 
       # Wait for port open
-      #gp ports await 3306
+      gp ports await 3306
 
       # Wait until MySQL is reachable
-      # until mysqladmin ping; do
-      #   sleep 1
-      # done
+      until mysqladmin ping; do
+        sleep 1
+      done
 
       # Start Webserver
-      #npm run build
+      npm run start:dev
 
 # tasks:
 #   - name: database
