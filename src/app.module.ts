@@ -6,8 +6,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ApiResponse } from './shared';
 import { Event } from './events/entities/event.entity';
-import config from 'orm.config';
+import ormConfig from 'orm.config';
 import { EventRepository } from './events/repositories/event.repository';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -28,6 +29,17 @@ import { EventRepository } from './events/repositories/event.repository';
     //     ],
     //   }
     // )
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [ormConfig],
+      expandVariables: true,
+      // envFilePath: `${process.env.NODE_ENV}.env`,
+      envFilePath: `.env`,
+    }),
+    TypeOrmModule.forRootAsync({
+      useFactory: ormConfig,
+      imports: undefined,
+    }),
   ],
   controllers: [EventController, AppController],
   providers: [EventRepository, EventService, AppService, ApiResponse],

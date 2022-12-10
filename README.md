@@ -75,3 +75,12 @@ Nest is [MIT licensed](LICENSE).
 ## Create migration
 typeorm migration:create ./src/database/migrations/Test
 npm run migration:create ./src/database/migrations/Test
+
+## Fix mysql error
+  `ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client`
+
+```bash
+ALTER USER 'admin'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin123';
+
+FLUSH PRIVILEGES;
+```
