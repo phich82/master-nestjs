@@ -22,6 +22,11 @@ tasks:
       mysql -e "GRANT ALL PRIVILEGES ON * . * TO 'admin'@'localhost';"
       mysql -e "FLUSH PRIVILEGES;"
 
+      docker run --restart always -d --name=mysql -p 127.0.0.1:3306:3306 -e MYSQL_DATABASE=master_nestjs MYSQL_USER=admin MYSQL_ROOT_PASSWORD=admin123 mysql:8
+
+      docker ps
+      gp ports await 3306
+
       # docker run --restart always -d --name=mysql -p 127.0.0.1:3306:3306 -e MYSQL_DATABASE=master_nestjs MYSQL_USER=admin MYSQL_ROOT_PASSWORD=admin123 mysql:8
       # docker run --restart always -d --name=adminer --link mysql:mysql -p 5000:8080 -e ADMINER_DESIGN=phich82 -e ADMINER_DEFAULT_SERVER=mysql
 
