@@ -18,13 +18,13 @@ import {
   ErrorJsonResponse,
   JsonResponse,
   QueryParam,
-} from 'src/shared';
-import { Event } from './Event';
+} from '@/shared';
 import { CreateEventDto } from './dto/CreateEventDto';
 import { EventDto } from './dto/EventDto';
 import { EventQueryParam } from './EventQueryParam';
 import { UpdateEventDto } from './dto/UpdateEventDto';
 import { EventService } from './services/event.service';
+import { Event } from './entities/event.entity';
 
 @Controller('/events')
 export class EventController {
@@ -34,47 +34,47 @@ export class EventController {
   ) {}
 
   @Get('/all')
-  searchAll(): JsonResponse<EventDto[], ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.searchAll());
+  async searchAll(): Promise<JsonResponse<Event[], ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.searchAll());
   }
 
   @Get()
-  searchBy(
+  async searchBy(
     @Query() params: EventQueryParam,
-  ): JsonResponse<EventDto[], ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.searchBy(params));
+  ): Promise<JsonResponse<EventDto[], ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.searchBy(params));
   }
 
   @Get(':id')
-  find(@Param('id') id: number): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.find(id));
+  async find(@Param('id') id: number): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.find(id));
   }
 
   @Post()
-  create(
+  async create(
     @Body() params: CreateEventDto,
-  ): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.create(params));
+  ): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.create(params));
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: number,
     @Body() params: UpdateEventDto,
-  ): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.update(id, params));
+  ): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.update(id, params));
   }
 
   @Patch(':id')
-  updatePartial(
+  async updatePartial(
     @Param('id') id: number,
     @Body() params: UpdateEventDto,
-  ): JsonResponse<EventDto, ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.updatePartial(id, params));
+  ): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.updatePartial(id, params));
   }
 
   @Delete(':id')
-  destroy(@Param('id') id: number): JsonResponse<any, ErrorJsonResponse> {
-    return this.apiResponse.success(this.eventService.destroy(id));
+  async destroy(@Param('id') id: number): Promise<JsonResponse<any, ErrorJsonResponse>> {
+    return this.apiResponse.success(await this.eventService.destroy(id));
   }
 }

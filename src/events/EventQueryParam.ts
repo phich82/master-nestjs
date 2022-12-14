@@ -1,5 +1,8 @@
 import { QueryParam } from 'src/shared';
 
 export class EventQueryParam extends QueryParam {
-  name: string;
+  name?: string;
+  description?: string;
+  when?: Date;
+  address?: string;
 }

@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('event')
 export class Event {
@@ -8,12 +8,12 @@ export class Event {
   @Column({ length: 100})
   name: string;
 
-  @Column()
+  @Column({ length: 255 })
   description: string;
 
-  @Column({ name: 'when_date' })
+  @CreateDateColumn({ name: 'when'})
   when: Date;
 
-  @Column()
+  @Column({ length: 100 })
   address: string;
 }

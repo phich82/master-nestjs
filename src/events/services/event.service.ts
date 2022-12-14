@@ -2,91 +2,90 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Event } from '../Event';
+import { ILike } from 'typeorm';
+
 import { EventQueryParam } from '../EventQueryParam';
 import { CreateEventDto } from './../dto/CreateEventDto';
 import { UpdateEventDto } from './../dto/UpdateEventDto';
 import { EventRepository } from './../repositories/event.repository';
+import { Event } from './../entities/event.entity';
 
 @Injectable()
 export class EventService {
-  private events: Event[] = [];
 
   constructor(
-    @InjectRepository(EventRepository) private readonly eventRepository: EventRepository
+    @InjectRepository(Event)
+    private readonly eventRepository: EventRepository
   ) {}
 
   async searchAll(): Promise<Event[]> {
     return await this.eventRepository.find();
   }
 
-  searchBy(paramsQuery: EventQueryParam): Event[] {
-    return this.events.filter((event) =>
-      event.name.toLowerCase().includes(paramsQuery.name.toLowerCase()),
-    );
+  async searchBy(paramsQuery: EventQueryParam): Promise<Event[]> {
+    const conditions = [];
+    if (paramsQuery.name) {
+      conditions.push({ name: ILike(`%${paramsQuery.name}%`) });
+    }
+    if (paramsQuery.description) {
+      conditions.push({ description: ILike(`%${paramsQuery.description}%`) });
+    }
+    if (paramsQuery.when) {
+      conditions.push({ when: ILike(`%${paramsQuery.when}%`) });
+    }
+    if (paramsQuery.address) {
+      conditions.push({ when: ILike(`%${paramsQuery.address}%`) });
+    }
+    return await this.eventRepository.findBy(conditions);
   }
 
-  find(id: number): Event {
-    return this.events.find((event) => event.id === Number(id)) || null
+  async find(id: number): Promise<Event> {
+    // return await this.eventRepository.findOne({ where: { id } });
+    return await this.eventRepository.findOneBy({ id });
   }
 
-  create(params: CreateEventDto) {
-    const id = this.events.length < 1 ? 1 : Math.max(...this.events.map((event) => event.id)) + 1;
-    const event: Event = {
+  async create(params: CreateEventDto): Promise<Event> {
+    return await this.eventRepository.save({
       ...params,
-      when: params.when ? new Date(params.when): new Date,
-      id,
-    }
-    this.events.push(event);
-    return event;
-  }
-
-  update(id: number, params: UpdateEventDto): Event {
-    const index = this.events.findIndex((event) => event.id === Number(id));
-    if (index >= 0) {
-      this.events[index] = {
-        ...this.events[index],
-        ...params,
-        when: params.when ? new Date(params.when) : this.events[index].when,
-        id: this.events[index].id,
-      };
-      return this.events[index];
-    }
-    return null;
-  }
-
-  updatePartial(id: number, params: UpdateEventDto): Event {
-    const index = this.events.findIndex((event) => event.id === Number(id));
-    if (index >= 0) {
-      this.events[index] = {
-        ...this.events[index],
-        ...params,
-        when: params.when ? new Date(params.when) : this.events[index].when,
-        id: this.events[index].id,
-      }
-      return this.events[index];
-    }
-    return null;
-  }
-
-  destroy(id: number): boolean {
-    const index = this.events.findIndex((event) => event.id === Number(id));
-    if (index >= 0) {
-      this.events.splice(index, 1);
-      return true;
-    }
-    return false;
-  }
-
-  destroyMany(ids: Array<number>): number {
-    let deletedCount = 0;
-    ids.forEach((id) => {
-      if (this.destroy(id)) {
-        deletedCount++;
-      }
+      when: new Date(params.when),
     });
-    return deletedCount;
+  }
+
+  async update(id: number, params: UpdateEventDto): Promise<Event> {
+    const event = await this.find(id);
+    if (!event) {
+      throw new NotFoundException(`ID [${id} Not Found]`);
+    }
+    return await this.eventRepository.save({
+      ...event,
+      ...params,
+      when: params.when ? new Date(params.when) : event.when,
+    });
+  }
+
+  async updatePartial(id: number, params: UpdateEventDto): Promise<Event> {
+    const event = await this.find(id);
+    if (!event) {
+      throw new NotFoundException(`ID [${id} Not Found]`);
+    }
+    return await this.eventRepository.save({
+      ...event,
+      ...params,
+      when: params.when ? new Date(params.when).toString() : event.when,
+    });
+  }
+
+  async destroy(id: number): Promise<boolean> {
+    const event = await this.find(id);
+    if (!event) {
+      throw new NotFoundException(`ID [${id} Not Found]`);
+    }
+    return (await this.eventRepository.delete(id)).affected > 0;
+  }
+
+  async destroyMany(ids: Array<number>): Promise<number> {
+    return (await this.eventRepository.delete(ids)).affected;
   }
 }

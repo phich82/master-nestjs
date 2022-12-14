@@ -1,6 +1,6 @@
-import { LoggerService } from "@nestjs/common"
-import { BaseEntity, Repository, DeleteResult, FindOptionsWhere, FindOneOptions } from "typeorm"
-import { BaseServiceContract } from './contracts/base.service.contract';
+import { LoggerService } from '@nestjs/common';
+import { BaseEntity, Repository, DeleteResult, FindOptionsWhere, FindOneOptions } from 'typeorm';
+import { BaseServiceContract } from '@/services/contracts/base-service.contract';
 
 export class BaseService<T extends BaseEntity, R extends Repository<T>> implements BaseServiceContract<T> {
   protected readonly repository: R;
