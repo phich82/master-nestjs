@@ -53,7 +53,7 @@ export class EventService {
   async create(params: CreateEventDto): Promise<Event> {
     return await this.eventRepository.save({
       ...params,
-      when: new Date(params.when),
+      when: params.when ? new Date(params.when) : new Date(),
     });
   }
 
