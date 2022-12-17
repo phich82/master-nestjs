@@ -2,18 +2,20 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike } from 'typeorm';
 
 import { EventQueryParam } from '../EventQueryParam';
-import { CreateEventDto } from './../dto/CreateEventDto';
-import { UpdateEventDto } from './../dto/UpdateEventDto';
-import { EventRepository } from './../repositories/event.repository';
-import { Event } from './../entities/event.entity';
+import { CreateEventDto } from '../dto/CreateEventDto';
+import { UpdateEventDto } from '../dto/UpdateEventDto';
+import { EventRepository } from '../repositories/event.repository';
+import { Event } from '../entities/event.entity';
 
 @Injectable()
 export class EventService {
+
+  private readonly logger: Logger = new Logger(EventService.name);
 
   constructor(
     @InjectRepository(Event)
@@ -21,6 +23,8 @@ export class EventService {
   ) {}
 
   async searchAll(): Promise<Event[]> {
+    this.logger.log('search all');
+    this.logger.debug('search all');
     return await this.eventRepository.find();
   }
 

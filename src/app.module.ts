@@ -1,31 +1,51 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AppJapanService } from './app-japan.service';
+import { EventModule } from '@modules/events/event.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EventService } from './events/services/event.service';
-import { EventController } from './events/event.controller';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ApiResponse } from './shared';
-import { Event } from './events/entities/event.entity';
 import ormConfig from '@config/orm.config';
-import { EventRepository } from './events/repositories/event.repository';
-import { ConfigModule } from '@nestjs/config';
+import { AppDummy } from './app-dummy';
+import ormConfigProd from './config/orm.config.prod';
 
+console.log('process.env => ', process.env.NODE_ENV)
 @Module({
   imports: [
+    EventModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [ormConfig],
       expandVariables: true,
-      // envFilePath: `${process.env.NODE_ENV}.env`,
-      envFilePath: `.env`,
+      envFilePath: `${process.env.NODE_ENV || ''}.env`,
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: ormConfig,
+      useFactory: process.env.NODE_ENV != 'production' ? ormConfig : ormConfigProd,
       imports: undefined,
     }),
-    TypeOrmModule.forFeature([Event]),
   ],
-  controllers: [AppController, EventController],
-  providers: [EventService, AppService, ApiResponse],
+  controllers: [
+    AppController,
+  ],
+  providers: [
+    // AppJapanService,
+    // AppService,
+    ApiResponse,
+    AppDummy,
+    {
+      provide: AppService,
+      useClass: AppJapanService,
+    },
+    {
+      provide: 'APP_NAME',
+      useValue: 'Value from japan'
+    },
+    {
+      provide: 'MESSAGE',
+      inject: [AppDummy],
+      useFactory: (app) => `${app.dummy()} Fatory!`,
+    }
+  ],
 })
-export class AppModule {}
+export class AppModule { }

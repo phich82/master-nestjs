@@ -1,7 +1,3 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import {
   Body,
   Controller,
@@ -25,6 +21,7 @@ import { EventQueryParam } from './EventQueryParam';
 import { UpdateEventDto } from './dto/UpdateEventDto';
 import { EventService } from './services/event.service';
 import { Event } from './entities/event.entity';
+import { ParseIntPipe, ValidationPipe } from '@nestjs/common/pipes';
 
 @Controller('/events')
 export class EventController {
@@ -46,13 +43,15 @@ export class EventController {
   }
 
   @Get(':id')
-  async find(@Param('id') id: number): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
+  async find(@Param('id', ParseIntPipe) id: number): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
+    console.log(typeof id);
     return this.apiResponse.success(await this.eventService.find(id));
   }
 
   @Post()
   async create(
-    @Body() params: CreateEventDto,
+    // @Body(ValidationPipe) params: CreateEventDto,
+    @Body(new ValidationPipe({ groups: ['create'] })) params: CreateEventDto,
   ): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
     return this.apiResponse.success(await this.eventService.create(params));
   }
@@ -60,7 +59,7 @@ export class EventController {
   @Put(':id')
   async update(
     @Param('id') id: number,
-    @Body() params: UpdateEventDto,
+    @Body(new ValidationPipe({ groups: ['update'] })) params: UpdateEventDto,
   ): Promise<JsonResponse<EventDto, ErrorJsonResponse>> {
     return this.apiResponse.success(await this.eventService.update(id, params));
   }

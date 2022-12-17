@@ -1,4 +1,4 @@
-import { QueryParam } from 'src/shared';
+import { QueryParam } from '@/shared';
 
 export class EventQueryParam extends QueryParam {
   name?: string;

@@ -12,7 +12,7 @@ export default registerAs(
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
     entities: [Event],
-    synchronize: true,
+    synchronize: false,
     dropSchema: Boolean(parseInt(process.env.DB_DROP_SCHEMA)),
     // migrations: ["${rootDir}/src/database/migrations/**/*.{js,ts}"],
   }),
