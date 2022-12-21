@@ -9,9 +9,7 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug'],
   });
   // app.useGlobalPipes(new ValidationPipe());
-  app.useGlobalFilters(new AppException(
-    app.get(HttpAdapterHost)
-  ));
+  app.useGlobalFilters(new AppException(app.get(HttpAdapterHost)));
   await app.listen(8000);
 }
 bootstrap();

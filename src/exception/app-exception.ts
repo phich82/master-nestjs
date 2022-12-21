@@ -1,4 +1,12 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpAdapterHost, HttpException, HttpStatus, Logger } from "@nestjs/common";
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpAdapterHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { ApiResponse } from '@/shared';
 
 @Catch()
@@ -6,9 +14,7 @@ export class AppException implements ExceptionFilter {
 
   private readonly logger: Logger = new Logger(AppException.name);
 
-  constructor(
-    private readonly httpAdapterHost: HttpAdapterHost
-  ) {}
+  constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: HttpException, host: ArgumentsHost): void {
     const { httpAdapter } = this.httpAdapterHost;
@@ -31,7 +37,7 @@ export class AppException implements ExceptionFilter {
 
     this.logger.error(dataTrack);
 
-    const responseBody = (new ApiResponse()).error(erroreMessage, httpStatus);
+    const responseBody = new ApiResponse().error(erroreMessage, httpStatus);
 
     httpAdapter.reply(response, responseBody, httpStatus);
   }
